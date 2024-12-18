@@ -1,0 +1,92 @@
+---
+title: "Hart Pond R Markdown"
+author: "Nick Duellman"
+date: "2024-11-22"
+output: html_document
+---
+
+This markdown file was designed to pull data from Github, format it using tidyr and plot using ggplot
+
+Github: <https://github.com/duellmannj/Phosphorus_data_HartPond>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Install Packages
+
+Packages used for plotting and formatting data
+
+```{install and set up packages, echo=TRUE}
+install.packages("ggplot2")
+install.packages("tidyverse")
+install.packages("tidyr")
+install.packages("readr")
+
+library(tidyverse)
+library(tidyr)
+library(ggplot2)
+library(readr)
+
+
+```
+
+## Import Data
+
+Before running the rest of code, select which phos_data you want to plot
+
+```{import data for each location, echo=TRUE}
+
+# Dock 
+
+phos_data <-read.csv('https://raw.githubusercontent.com/duellmannj/Phosphorus_data_HartPond/refs/heads/main/Phos_csv_dock%20-%20Dock.csv')
+
+
+# Dam
+
+phos_data <- read.csv('https://raw.githubusercontent.com/duellmannj/Phosphorus_data_HartPond/refs/heads/main/Phos_csv_dock%20-%20Dam.csv')
+
+
+# Stream 
+
+phos_data <- read.csv('https://raw.githubusercontent.com/duellmannj/Phosphorus_data_HartPond/refs/heads/main/Phos_csv_dock%20-%20Stream.csv')
+
+
+```
+
+## Format the data
+
+Format the data for ggplot utilization, use this code for every time you switch data inputs
+
+For instance, if you are plotting Dock and switch to Dam, make sure to reformat the data before plotting
+
+```{format, echo=TRUE}
+
+phos.df <- pivot_longer(phos_data, cols = 2:4, names_to = "Phosphorus Type", values_to = "Value")
+head(phos.df)
+
+```
+
+## Plot data using ggplot
+
+```{plot, echo=TRUE}
+
+p <- ggplot(phos.df, aes(x = Date, y = Value, color = `Phosphorus Type`, linetype = Depth, group = interaction(`Phosphorus Type`, Depth))) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  facet_wrap( ~ `Phosphorus Type`) +
+  labs( title = "Phosphorus Measurements of the Dock Surface and Bottom in Hart Pond across sampling period",
+        x = "Date",
+        y = "Value",
+        color = "Phosphorus Type",
+        linetype = "Depth") +
+  theme_classic() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "right"
+  )
+
+print(p)
+
+
+```
